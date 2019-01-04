@@ -19,11 +19,13 @@ class SaleOrderLine(models.Model):
             partner_id, lang, update_tax, date_order, packaging,
             fiscal_position, flag, warehouse_id, context=context)
         product = self.env['product.product'].browse(product_id)
-        if product.price_valid_date < fields.Datetime.now():
+        if product.price_valid_date and product.price_valid_date < \
+                fields.Datetime.now():
             res['warning'] = {
                 'title': _('Warning'),
-                'message': _('The valid price date has expired: {}'.format(
-                    product.name))}
+                'message': _(
+                    "This product has its price already expired. Please "
+                    "contact Purchasing in order get it updated")}
         return res
 
 
@@ -39,6 +41,6 @@ class SaleOrder(models.Model):
             if price_valid_dates:
                 raise exceptions.ValidationError(
                     _("At least one product has expired valid date "
-                      "price: {}".format(
-                        price_valid_dates.mapped("product_id.name"))))
+                      "price: {}".format(", ".join(
+                        price_valid_dates.mapped("product_id.name")))))
         return super(SaleOrder, self).action_button_confirm()
