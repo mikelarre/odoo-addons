@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+
+    <record model="ir.ui.view" id="view_purchase_requisition_form_supplier">
+        <field name="name">view.purchase.requisition.form.supplier</field>
+        <field name="model">purchase.requisition</field>
+        <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='product_uom_id']" position="after">
+                <field name="supplier_id"/>
+                <field name="description"/>
+                <field name="route_ids" widget="many2many_tags"/>
+                <field name="order_id"/>
+            </xpath>
+            <xpath expr="//sheet/div[@name='button_box']" position="inside">
+                    <button name="%(action_purchase_requisition_line_list)d" type="action" class="oe_stat_button" icon="fa-list-alt">
+                        <span class="o_stat_text">Requisition Lines</span>
+                    </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="purchase_requisition_line_tree">
+        <field name="name">purchase.requisition.line.tree</field>
+        <field name="model">purchase.requisition.line</field>
+        <field name="arch" type="xml">
+            <tree string="Products" editable="bottom">
+                <field name="product_id"/>
+                <field name="product_qty"/>
+                <field name="qty_ordered"/>
+                <field name="product_uom_id" groups="uom.group_uom"/>
+                <field name="supplier_id"/>
+                <field name="description"/>
+                <field name="route_ids" widget="many2many_tags"/>
+                <field name="order_id"/>
+                <field name="schedule_date" groups="base.group_no_one"/>
+                <field name="account_analytic_id" groups="analytic.group_analytic_accounting"/>
+                <field name="analytic_tag_ids" groups="analytic.group_analytic_tags" widget="many2many_tags"/>
+                <field name="price_unit"/>
+            </tree>
+        </field>
+    </record>
+
+     <record id="purchase_requisition_line_action" model="ir.actions.act_window">
+         <field name="name">Purchase requisition line action</field>
+         <field name="res_model">purchase.requisition.line</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree,form</field>
+         <field name="view_id" ref="purchase_requisition_line_tree" />
+     </record>
+
+    <menuitem id="purchase_requisition_line_menu" name="Purchase Requisition Lines" parent="purchase.menu_procurement_management" action="purchase_requisition_line_action" />
+
+    <record id="create_order_server_action" model="ir.actions.server">
+            <field name="name">Create Orders</field>
+            <field name="model_id" ref="model_purchase_requisition_line"/>
+            <field name="binding_model_id" ref="model_purchase_requisition_line"/>
+            <field name="state">code</field>
+            <field name="condition">True</field>
+            <field name="code">action = records.create_orders()</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_purchase_requisition_line_list">
+        <field name="name">Requisition Lines</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.requisition.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('requisition_id','=',active_id)]</field>
+        <field name="context">{"default_requisition_id":active_id}</field>
+    </record>
+</openerp>
