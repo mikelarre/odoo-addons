@@ -41,6 +41,7 @@ class ImportInventory(models.TransientModel):
                 imeiname = ""
                 if len(rowValues) > 3:
                     locationname = str(rowValues[3]).strip()
+                if len(rowValues) > 4:
                     imeiname = str(rowValues[4]).strip()
             except Exception:
                 raise exceptions.Warning(
